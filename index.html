@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+        <title>Sentence-thesia</title>
+        <style media="screen" type="text/css">
+            #input {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-direction: column;
+            }
+
+            #input > h1 {
+                margin-bottom: 0;
+            }
+
+            #input > p {
+                margin-top: 4px;
+            }
+
+            #input > textarea {
+                height: 250px;
+                width: 800px;
+                font-size: 16px;
+                max-width: 100%;
+            }
+
+            #input button {
+                border: none;
+                height: 40px;
+                font-size: 18px;
+                width: 100px;
+                margin: 6px;
+                margin-top: 16px;
+            }
+
+            #input button:hover {
+                cursor: pointer;
+            }
+
+            #input button:focus {
+                outline: none;
+            }
+
+            #input button:active {
+                transform: scale(1.1);
+            }
+
+            #output {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            #output > p {
+                width: 1000px;
+            }
+
+            #output span {
+                font-size: 22px;
+            }
+
+            #process {
+                background: linear-gradient(124deg, #ff2400, #e81d1d, #e8b71d, #e3e81d, #1de840, #41f4c4, #41a3f4, #dd00f3, #dd00f3);
+                background-size: 1800% 1800%;
+
+                -webkit-animation: rainbow 9s ease infinite;
+                -z-animation: rainbow 9s ease infinite;
+                -o-animation: rainbow 9s ease infinite;
+                animation: rainbow 9s ease infinite;
+            }
+
+            @-webkit-keyframes rainbow {
+                0%{background-position:0% 82%}
+                50%{background-position:100% 19%}
+                100%{background-position:0% 82%}
+            }
+            @-moz-keyframes rainbow {
+                0%{background-position:0% 82%}
+                50%{background-position:100% 19%}
+                100%{background-position:0% 82%}
+            }
+            @-o-keyframes rainbow {
+                0%{background-position:0% 82%}
+                50%{background-position:100% 19%}
+                100%{background-position:0% 82%}
+            }
+            @keyframes rainbow {
+                0%{background-position:0% 82%}
+                50%{background-position:100% 19%}
+                100%{background-position:0% 82%}
+            }
+
+            #example {
+                background: linear-gradient(60deg, #383838, #bababa, #8e8e8e, #5b5b5b, #e5e5e5);
+                background-size: 900% 900%;
+
+                -webkit-animation: rainbow 9s ease infinite;
+                -z-animation: rainbow 9s ease infinite;
+                -o-animation: rainbow 9s ease infinite;
+                animation: rainbow 9s ease infinite;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="input">
+            <h1>Sentence-thesia</h1>
+            <p>colors sentences by length</p>
+            <textarea placeholder="Feed me sentences, preferably of variable length."></textarea>
+            <div>
+                <button id="process">Colorize!</button>
+                <button id="example">Example</button>
+            </div>
+        </div>
+        <div id="output">
+            <p></p>
+        </div>
+        <script src="./index.js"></script>
+        <script src="./example.js"></script>
+    </body>
+</html>
