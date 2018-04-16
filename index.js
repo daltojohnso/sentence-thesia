@@ -5,67 +5,46 @@
         submit: document.querySelector('#process'),
         example: document.querySelector('#example'),
         textarea: document.querySelector('#input > textarea'),
-        out: document.querySelector('#output > p')
-    };
-    const state = {
-        colors: {},
-        lengths: {}
+        output: document.querySelector('#output > p')
     };
 
-    $els.submit.addEventListener('click', onSubmit);
+    $els.submit.addEventListener('click', () => onSubmit($els.textarea.value));
     $els.example.addEventListener('click', onExample);
 
-    // imp
-    function onSubmit () {
-        resetState();
-        const sentences = buildSentences(getText($els.textarea.value));
-        const uniqueLengths = getUniqueLengths(sentences);
-        state.lengths = buildLengthsMap(uniqueLengths);
-        state.colors = buildColorsMap(uniqueLengths, state.lengths);
-        const coloredSentences = addColorToSentences(sentences, state.colors);
-        appendSentencesToDOM(coloredSentences);
-    }
-
-    // imp
-    function onExample () {
-        $els.textarea.value = EXAMPLE_TEXT;
-        $els.submit.dispatchEvent(
-            new MouseEvent('click', {
-              view: window,
-              bubbles: true,
-              cancelable: true
-            })
+    function onSubmit (value) {
+        emptyOutput();
+        appendSentencesToDOM(
+            addColorToSentences(
+                parseSentences(value)
+            )
         );
     }
 
-    // imp
-    function resetState () {
-        const clone = $els.out.cloneNode(false);
-        $els.out.parentNode.replaceChild(clone, $els.out);
-        $els.out = clone;
-        delete state.colors;
-        delete state.lengths;
+    function onExample () {
+        $els.textarea.value = EXAMPLE_TEXT;
+        onSubmit($els.textarea.value);
     }
 
-    // imp
+    function emptyOutput () {
+        const clone = $els.output.cloneNode(false);
+        $els.output.parentNode.replaceChild(clone, $els.output);
+        $els.output = clone;
+    }
+
     function appendSentencesToDOM (sentences) {
-        const out = $els.out;
+        const output = $els.output;
         sentences.forEach(sentence => {
-            const s = document.createElement('span');
-            s.innerText = sentence.value;
-            s.style.color = sentence.color;
-            s.title = `${sentence.length} words`;
-            out.appendChild(s);
+            const span = document.createElement('span');
+            span.innerText = sentence.value;
+            span.style.color = sentence.color;
+            span.title = `${sentence.length} words`;
+            output.appendChild(span);
         });
     }
 
-    function getText (str = '') {
-        let text = str.trim();
-        // cheap hack
-        return text && !/[\.\?\!]/g.test(text[text.length-1]) ? `${text}.` : text;
-    }
-
-    function buildSentences (text) {
+    function parseSentences (text = '') {
+        text = text.trim();
+        text = text && !/[\.\?\!]/g.test(text[text.length-1]) ? `${text}.` : text;
         const sentenceStrs = splitIntoSentences(text);
         return splitIntoSentences(text).map(sentenceString => ({
             length: countWords(sentenceString),
@@ -110,7 +89,10 @@
         }, {});
     }
 
-    function addColorToSentences (sentences, colorsMap) {
+    function addColorToSentences (sentences) {
+        const uniqueLengths = getUniqueLengths(sentences);
+        const lengthsMap = buildLengthsMap(uniqueLengths);
+        const colorsMap = buildColorsMap(uniqueLengths, lengthsMap);
         return sentences.map(sentence => Object.assign({}, sentence, {
             color: colorsMap[sentence.length]
         }));
