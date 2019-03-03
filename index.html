@@ -64,6 +64,7 @@
             #process {
                 background: linear-gradient(124deg, #ff2400, #e81d1d, #e8b71d, #e3e81d, #1de840, #41f4c4, #41a3f4, #dd00f3, #dd00f3);
                 background-size: 1800% 1800%;
+                will-change: background-position;
 
                 -webkit-animation: rainbow 9s ease infinite;
                 -z-animation: rainbow 9s ease infinite;
@@ -95,6 +96,7 @@
             #example {
                 background: linear-gradient(60deg, #383838, #bababa, #8e8e8e, #5b5b5b, #e5e5e5);
                 background-size: 900% 900%;
+                will-change: background-position;
 
                 -webkit-animation: rainbow 9s ease infinite;
                 -z-animation: rainbow 9s ease infinite;
@@ -107,7 +109,7 @@
         <div id="input">
             <h1>Sentence-thesia</h1>
             <p>colors sentences by length</p>
-            <textarea placeholder="Feed me sentences, preferably of variable length."></textarea>
+            <textarea placeholder="Feed me sentences, preferably of variable length." spellcheck="false"></textarea>
             <div>
                 <button id="process">Colorize!</button>
                 <button id="example">Example</button>

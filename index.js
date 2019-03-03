@@ -12,17 +12,25 @@
     $els.example.addEventListener('click', onExample);
 
     function onSubmit (value) {
-        emptyOutput();
-        appendSentencesToDOM(
-            addColorToSentences(
-                parseSentences(value)
-            )
-        );
+        requestAnimationFrame(() => {
+            emptyOutput();
+            requestAnimationFrame(() => {
+                const sentences = parseSentences(value);
+                requestAnimationFrame(() => {
+                    const coloredSentences = addColorToSentences(sentences);
+                    requestAnimationFrame(() => {
+                        appendSentencesToDOM(coloredSentences);
+                    });
+                });
+            });
+        });
     }
 
     function onExample () {
-        $els.textarea.value = EXAMPLE_TEXT;
-        onSubmit($els.textarea.value);
+        requestAnimationFrame(() => {
+            $els.textarea.value = EXAMPLE_TEXT;
+            onSubmit($els.textarea.value);
+        });
     }
 
     function emptyOutput () {
@@ -33,13 +41,15 @@
 
     function appendSentencesToDOM (sentences) {
         const output = $els.output;
+        const fragment = document.createDocumentFragment();
         sentences.forEach(sentence => {
             const span = document.createElement('span');
             span.innerText = sentence.value;
             span.style.color = sentence.color;
             span.title = `${sentence.length} words`;
-            output.appendChild(span);
+            fragment.appendChild(span);
         });
+        output.appendChild(fragment);
     }
 
     function parseSentences (text = '') {
