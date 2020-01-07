@@ -1,4 +1,150 @@
-const EXAMPLE_TEXT = `
+interface Sentence {
+    length: number,
+    value: string
+}
+
+interface ColoredSentence extends Sentence {
+    color: string;
+}
+
+interface ColorsMap {
+    [x: string]: string;
+}
+
+const $els: {
+    submit: HTMLButtonElement,
+    example: HTMLButtonElement,
+    textarea: HTMLTextAreaElement,
+    output: HTMLParagraphElement
+} = {
+    submit: document.querySelector('#process'),
+    example: document.querySelector('#example'),
+    textarea: document.querySelector('#input > textarea'),
+    output: document.querySelector('#output > p')
+}
+
+$els.submit.addEventListener('click', () => onSubmit($els.textarea.value));
+$els.example.addEventListener('click', onExample);
+
+function onSubmit (value: string): void {
+        emptyOutput();
+        requestAnimationFrame(() => {
+            const sentences = parseSentences(value);
+            const coloredSentences = addColorToSentences(sentences);
+            requestAnimationFrame(() => {
+                appendSentencesToDOM(coloredSentences);
+            });
+        });
+}
+
+function onExample (): void {
+    requestAnimationFrame(() => {
+        $els.textarea.value = EXAMPLE_TEXT;
+        onSubmit($els.textarea.value);
+    });
+}
+
+function emptyOutput (): void {
+    const clone = $els.output.cloneNode(false);
+    $els.output.parentNode.replaceChild(clone, $els.output);
+    $els.output = clone as HTMLParagraphElement;
+}
+
+function appendSentencesToDOM (sentences: ColoredSentence[]): void {
+    const output = $els.output;
+    const fragment = document.createDocumentFragment();
+    sentences.forEach(sentence => {
+        const span = document.createElement('span');
+        span.innerText = sentence.value;
+        span.style.color = sentence.color;
+        span.title = `${sentence.length} words`;
+        fragment.appendChild(span);
+    });
+    output.appendChild(fragment);
+}
+
+
+function parseSentences (text: string = ''): Sentence[] {
+    text = text.trim();
+    text = text && !/[\.\?\!]/g.test(text[text.length-1]) ? `${text}.` : text;
+    return splitIntoSentences(text).map(sentenceString => ({
+        length: countWords(sentenceString),
+        value: sentenceString
+    }));
+}
+
+function splitIntoSentences (text: string): string[] {
+    return text.match(/[^\.!\?]+[\.!\?]+/g) || [text];
+}
+
+function countWords (sentenceString: string): number {
+    return getWordsByNonWhiteSpace(sentenceString).length;
+}
+
+function getWordsByNonWhiteSpace (str: string): string[] {
+    const notLettersOrWhitespace = /[^\w\s]|_/g;
+    const allWhitespace = /\s+/g
+    const allNotWhitespace = /\S+/g;
+    return str.replace(notLettersOrWhitespace, '')
+        .replace(allWhitespace, ' ')
+        .toLowerCase().match(allNotWhitespace) || [];
+}
+
+function getUniqueLengths (sentences: Sentence[]): number[] {
+    return Array.from(new Set(sentences.map(({length}) => length)));
+}
+
+function buildLengthsMap (lengths: number[]): object {
+    lengths = lengths.sort();
+    return lengths.reduce((lengthsMap: object, key, index) => {
+        lengthsMap[key] = index;
+        return lengthsMap;
+    }, {});
+}
+
+function buildColorsMap (lengths: number[], lengthsMap: object): ColorsMap {
+    const numLengths: number = lengths.length;
+    return lengths.reduce((colorsMap: ColorsMap, length: number) => {
+        colorsMap[length] = rainbow(numLengths, lengthsMap[length]);
+        return colorsMap;
+    }, {});
+}
+
+function addColorToSentences (sentences: Sentence[]): ColoredSentence[] {
+    const uniqueLengths = getUniqueLengths(sentences);
+    const lengthsMap = buildLengthsMap(uniqueLengths);
+    const colorsMap = buildColorsMap(uniqueLengths, lengthsMap);
+    return sentences.map(sentence => ({
+        ...sentence,
+        color: colorsMap[sentence.length]
+    }));
+}
+
+// https://stackoverflow.com/questions/1484506/random-color-generator
+function rainbow (numOfSteps: number, step: number): string {
+    // This function generates vibrant, "evenly spaced" colours (i.e. no clustering). This is ideal for creating easily distinguishable vibrant markers in Google Maps and other apps.
+    // Adam Cole, 2011-Sept-14
+    // HSV to RBG adapted from: http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
+    var r: number;
+    var g: number;
+    var b: number;
+    var h = step / numOfSteps;
+    var i = ~~(h * 6);
+    var f = h * 6 - i;
+    var q = 1 - f;
+    switch(i % 6){
+        case 0: r = 1; g = f; b = 0; break;
+        case 1: r = q; g = 1; b = 0; break;
+        case 2: r = 0; g = 1; b = f; break;
+        case 3: r = 0; g = q; b = 1; break;
+        case 4: r = f; g = 0; b = 1; break;
+        case 5: r = 1; g = 0; b = q; break;
+    }
+    var c = "#" + ("00" + (~ ~(r * 255)).toString(16)).slice(-2) + ("00" + (~ ~(g * 255)).toString(16)).slice(-2) + ("00" + (~ ~(b * 255)).toString(16)).slice(-2);
+    return (c);
+}
+
+const EXAMPLE_TEXT: string = `
 The gods had condemned Sisyphus to ceaselessly rolling a rock to the top of a mountain, whence the stone would fall back of its own weight. They had thought with some reason that there is no more dreadful punishment than futile and hopeless labor.
 
 If one believes Homer, Sisyphus was the wisest and most prudent of mortals. According to another tradition, however, he was disposed to practice the profession of highwayman. I see no contradiction in this. Opinions differ as to the reasons why he became the futile laborer of the underworld. To begin with, he is accused of a certain levity in regard to the gods. He stole their secrets. Egina, the daughter of Esopus, was carried off by Jupiter. The father was shocked by that disappearance and complained to Sisyphus. He, who knew of the abduction, offered to tell about it on condition that Esopus would give water to the citadel of Corinth. To the celestial thunderbolts he preferred the benediction of water. He was punished for this in the underworld. Homer tells us also that Sisyphus had put Death in chains. Pluto could not endure the sight of his deserted, silent empire. He dispatched the god of war, who liberated Death from the hands of her conqueror.
